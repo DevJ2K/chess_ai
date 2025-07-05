@@ -1,5 +1,5 @@
 import numba
-from app.chess.PieceMovement import PieceMovement
+from app.chess.piece_movements import warm_up_movement, get_pawn_movement
 from app.chess.Chess import Chess
 from benchmark.MeasureTime import MeasureTime
 
@@ -7,10 +7,10 @@ from benchmark.MeasureTime import MeasureTime
 print("Numba JIT : [ON]")
 
 board = Chess.initialize_board()
-piece_movement = PieceMovement()
+warm_up_movement()
 
 measureTime = MeasureTime(start=True)
-piece_movement.get_pawn_movement(board, x=0, y=1, is_white_turn=True)
+get_pawn_movement(board, x=0, y=1, is_white_turn=True)
 measureTime.stop()
 
 
@@ -26,8 +26,7 @@ def fake_njit(*args, **kwargs):
 numba.njit = fake_njit
 
 board = Chess.initialize_board()
-piece_movement = PieceMovement()
 
 measureTime = MeasureTime(start=True)
-piece_movement.get_pawn_movement(board, x=0, y=1, is_white_turn=True)
+get_pawn_movement(board, x=0, y=1, is_white_turn=True)
 measureTime.stop()
