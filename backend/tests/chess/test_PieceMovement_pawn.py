@@ -6,6 +6,8 @@ import numpy as np
 def test_default_pawn_movement():
     board = Chess.initialize_board()
     piece_movement = PieceMovement()
+
+    # WHITE PAWNS
     np.testing.assert_array_equal(
         piece_movement.get_pawn_movement(board, x=0, y=1, is_white_turn=True),
         np.array([(0, 2), (0, 3)])
@@ -39,6 +41,7 @@ def test_default_pawn_movement():
         np.array([(7, 2), (7, 3)])
     )
 
+    # BLACK PAWNS
     np.testing.assert_array_equal(
         piece_movement.get_pawn_movement(board, x=0, y=6, is_white_turn=False),
         np.array([(0, 5), (0, 4)])
@@ -89,4 +92,55 @@ def test_pawn_movement_with_obstacles():
     np.testing.assert_array_equal(
         piece_movement.get_pawn_movement(board, x=0, y=1, is_white_turn=True),
         np.array([(0, 2)])
+    )
+
+    # white pawn at (0, 5)
+    board = Chess.initialize_board()
+    board[5, 0] = 1
+    np.testing.assert_array_equal(
+        piece_movement.get_pawn_movement(board, x=0, y=6, is_white_turn=False),
+        np.empty((0, 2))
+    )
+
+    # white pawn at (0, 4)
+    board = Chess.initialize_board()
+    board[4, 0] = 1
+    np.testing.assert_array_equal(
+        piece_movement.get_pawn_movement(board, x=0, y=6, is_white_turn=False),
+        np.array([(0, 5)])
+    )
+
+    # white pawn at (0, 2)
+    board = Chess.initialize_board()
+    board[2, 0] = 1
+    np.testing.assert_array_equal(
+        piece_movement.get_pawn_movement(board, x=0, y=1, is_white_turn=True),
+        np.empty((0, 2))
+    )
+
+    # black pawn at (0, 5)
+    board = Chess.initialize_board()
+    board[5, 0] = -1
+    np.testing.assert_array_equal(
+        piece_movement.get_pawn_movement(board, x=0, y=6, is_white_turn=False),
+        np.empty((0, 2))
+    )
+
+def test_pawn_movement_capture():
+    piece_movement = PieceMovement()
+
+    # white pawn at (0, 1) capturing black pawn at (1, 2)
+    board = Chess.initialize_board()
+    board[2, 1] = -1
+    np.testing.assert_array_equal(
+        piece_movement.get_pawn_movement(board, x=0, y=1, is_white_turn=True),
+        np.array([(0, 2), (0, 3), (1, 2)])
+    )
+
+    # black pawn at (0, 6) capturing white pawn at (1, 5)
+    board = Chess.initialize_board()
+    board[5, 1] = 1
+    np.testing.assert_array_equal(
+        piece_movement.get_pawn_movement(board, x=0, y=6, is_white_turn=False),
+        np.array([(0, 5), (0, 4), (1, 5)])
     )
