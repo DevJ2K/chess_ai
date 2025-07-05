@@ -153,6 +153,26 @@ class PieceMovement:
 
         return all_moves[:iteration]
 
+    @staticmethod
+    @njit
+    def get_king_movement(board: np.ndarray, x: int, y: int):
+        NUMBER_OF_POSSIBLE_MOVES = 8
+        all_moves = np.zeros((NUMBER_OF_POSSIBLE_MOVES, 2), dtype=np.int8)
+        iteration = 0
+
+        king_moves = np.array([
+            (1, 0), (0, 1), (-1, 0), (0, -1),
+            (1, 1), (1, -1), (-1, -1), (-1, 1)
+        ], dtype=np.int8)
+
+        for dx, dy in king_moves:
+            new_x, new_y = x + dx, y + dy
+            if is_in_board(board, new_x, new_y) and board[new_y, new_x] * board[y, x] <= 0:
+                all_moves[iteration] = (new_x, new_y)
+                iteration += 1
+
+        return all_moves[:iteration]
+
 @njit
 def is_in_board(board: np.ndarray, x: int, y: int):
     return 0 <= x < board.shape[1] and 0 <= y < board.shape[0]
@@ -191,7 +211,7 @@ if __name__ == "__main__":
     start_time = time.time()
     # for i in range(1):
     # moves = piece_movement.get_pawn_movement(board, x=0, y=1, is_white_turn=True)
-    moves = piece_movement.get_queen_movement(board, x=piece_x, y=piece_y)
+    moves = piece_movement.get_king_movement(board, x=piece_x, y=piece_y)
     end_time = time.time()
     print(f"Execution time: {end_time - start_time:.6f} seconds")
 
