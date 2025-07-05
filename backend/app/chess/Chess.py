@@ -6,11 +6,11 @@ class Chess:
         if board is not None:
             self.board: np.ndarray = board
         else:
-            self.board: np.ndarray = self.__initialize_board__()
-        self.current_turn: int = 1  # 1 for white, -1 for black
+            self.board: np.ndarray = Chess.initialize_board()
         self.move_history: list[str] = []
 
-    def __initialize_board__(self) -> np.ndarray:
+    @staticmethod
+    def initialize_board() -> np.ndarray:
         board = np.zeros((8, 8), dtype=np.int8)
 
         # White pieces
