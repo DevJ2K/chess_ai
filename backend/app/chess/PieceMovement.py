@@ -104,6 +104,34 @@ class PieceMovement:
 
         return all_moves[:iteration]
 
+    @staticmethod
+    @njit
+    def get_rook_movement(board: np.ndarray, x: int, y: int):
+        NUMBER_OF_POSSIBLE_MOVES = 14
+        all_moves = np.zeros((NUMBER_OF_POSSIBLE_MOVES, 2), dtype=np.int8)
+        iteration = 0
+
+        directions = [
+            (1, 0), (0, 1), (-1, 0), (0, -1)
+        ]
+
+        for dx, dy in directions:
+            new_x, new_y = x + dx, y + dy
+            while is_in_board(board, new_x, new_y):
+                if board[new_y, new_x] == 0:
+                    all_moves[iteration] = (new_x, new_y)
+                    iteration += 1
+                elif board[new_y, new_x] * board[y, x] < 0:
+                    all_moves[iteration] = (new_x, new_y)
+                    iteration += 1
+                    break
+                else:
+                    break
+                new_x += dx
+                new_y += dy
+
+        return all_moves[:iteration]
+
 @njit
 def is_in_board(board: np.ndarray, x: int, y: int):
     return 0 <= x < board.shape[1] and 0 <= y < board.shape[0]
@@ -114,7 +142,7 @@ if __name__ == "__main__":
     board = np.zeros((8, 8), dtype=np.int8)
 
     # White pieces
-    # board[1, :] = 1   # pawns
+    board[1, :] = 1   # pawns
     board[0, 2] = board[0, 5] = 2   # bishops
     board[0, 1] = board[0, 6] = 3   # knights
     board[0, 0] = board[0, 7] = 4   # rooks
@@ -136,8 +164,8 @@ if __name__ == "__main__":
 
     chess = Chess(board)
 
-    piece_x, piece_y = 2, 0
-    board[piece_y, piece_x] = 2
+    piece_x, piece_y = 0, 0
+    board[piece_y, piece_x] = 4
 
     print(chess)
 
@@ -145,7 +173,7 @@ if __name__ == "__main__":
     start_time = time.time()
     # for i in range(1):
     # moves = piece_movement.get_pawn_movement(board, x=0, y=1, is_white_turn=True)
-    moves = piece_movement.get_bishop_movement(board, x=piece_x, y=piece_y)
+    moves = piece_movement.get_rook_movement(board, x=piece_x, y=piece_y)
     end_time = time.time()
     print(f"Execution time: {end_time - start_time:.6f} seconds")
 
