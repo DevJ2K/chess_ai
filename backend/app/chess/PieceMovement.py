@@ -69,7 +69,7 @@ class PieceMovement:
 
         for dx, dy in knight_moves:
             new_x, new_y = x + dx, y + dy
-            if is_in_board(board, new_x, new_y) and board[new_y, new_x] <= 0:
+            if is_in_board(board, new_x, new_y) and board[new_y, new_x] * board[y, x] <= 0:
                 all_moves[iteration] = (new_x, new_y)
                 iteration += 1
 
@@ -107,8 +107,8 @@ if __name__ == "__main__":
 
     chess = Chess(board)
 
-    piece_x, piece_y = 4, 4
-    board[piece_y, piece_x] = 3
+    piece_x, piece_y = 1, 7
+    board[piece_y, piece_x] = -3
 
     print(chess)
 
