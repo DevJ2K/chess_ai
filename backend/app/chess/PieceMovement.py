@@ -1,10 +1,12 @@
 import numpy as np
+import tests.configuration  # un-comment to ignore Numba JIT annotations
 from numba import njit
 
 class PieceMovement:
     def __init__(self):
         # WARMUP Numba JIT compilation
         PieceMovement.get_pawn_movement(np.zeros((8, 8), dtype=np.int8), 0, 0, True)
+        PieceMovement.get_knight_movement(np.zeros((8, 8), dtype=np.int8), 0, 0)
         pass
 
     @staticmethod
@@ -52,6 +54,27 @@ class PieceMovement:
 
         return all_moves[:iteration]
 
+    @staticmethod
+    @njit
+    def get_knight_movement(board: np.ndarray, x: int, y: int):
+        NUMBER_OF_POSSIBLE_MOVES = 8
+        all_moves = np.zeros((NUMBER_OF_POSSIBLE_MOVES, 2), dtype=np.int8)
+        iteration = 0
+
+        knight_moves = np.array([
+            (1, 2),(2, 1), (2, -1), (1, -2),
+            (-1, -2), (-2, -1), (-2, 1), (-1, 2)
+        ], dtype=np.int8)
+
+
+        for dx, dy in knight_moves:
+            new_x, new_y = x + dx, y + dy
+            if is_in_board(board, new_x, new_y) and board[new_y, new_x] <= 0:
+                all_moves[iteration] = (new_x, new_y)
+                iteration += 1
+
+        return all_moves[:iteration]
+
 @njit
 def is_in_board(board: np.ndarray, x: int, y: int):
     return 0 <= x < board.shape[1] and 0 <= y < board.shape[0]
@@ -80,22 +103,28 @@ if __name__ == "__main__":
 
     # print(board)
 
+
+
     chess = Chess(board)
+
+    piece_x, piece_y = 4, 4
+    board[piece_y, piece_x] = 3
+
     print(chess)
 
     piece_movement = PieceMovement()
-
     start_time = time.time()
-    for i in range(1):
-        moves = piece_movement.get_pawn_movement(board, x=0, y=1, is_white_turn=True)
+    # for i in range(1):
+    # moves = piece_movement.get_pawn_movement(board, x=0, y=1, is_white_turn=True)
+    moves = piece_movement.get_knight_movement(board, x=piece_x, y=piece_y)
     end_time = time.time()
     print(f"Execution time: {end_time - start_time:.6f} seconds")
 
-    # for move in moves:
-    #     board_copy = board.copy()
-    #     x, y = move
-    #     board_copy[y, x] = 1
-    #     board_copy[1, 0] = 0
-    #     print(f"Move from (0, 1) to {move}:")
-    #     print(Chess(board_copy))
+    for move in moves:
+        board_copy = board.copy()
+        x, y = move
+        board_copy[y, x] = board_copy[piece_y, piece_x]
+        board_copy[piece_y, piece_x] = 0
+        print(f"Move from ({piece_x}, {piece_y}) to {move}:")
+        print(Chess(board_copy))
 
