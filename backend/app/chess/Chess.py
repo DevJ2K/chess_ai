@@ -1,5 +1,6 @@
 import numpy as np
 from app.chess.ChessTool import ChessTool
+from app.utils.Colors import REDHB, RESET
 
 class Chess:
     def __init__(self, board: np.ndarray = None):
@@ -35,6 +36,7 @@ class Chess:
     def __str__(self):
         string = "Chess Board:\n"
         pieces = {
+            0: '·', 14: REDHB + '?' + RESET,
             -1: '♙', 1: '♟',
             -2: '♗', 2: '♝',
             -3: '♘', 3: '♞',
@@ -47,10 +49,7 @@ class Chess:
             string += f"{8 - y} | "
             for x in range(len(self.board[y])):
                 piece = self.board[7 - y][x]
-                if piece != 0:
-                    string += pieces[piece] + " "
-                else:
-                    string += "· "
+                string += pieces[piece] + " "
             string += "\n"
         string += "  | - - - - - - - -\n"
         string += "    a b c d e f g h\n"
