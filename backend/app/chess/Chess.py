@@ -2,8 +2,11 @@ import numpy as np
 from app.chess.ChessTool import ChessTool
 
 class Chess:
-    def __init__(self):
-        self.board: np.ndarray = self.__initialize_board__()
+    def __init__(self, board: np.ndarray = None):
+        if board is not None:
+            self.board: np.ndarray = board
+        else:
+            self.board: np.ndarray = self.__initialize_board__()
         self.current_turn: int = 1  # 1 for white, -1 for black
         self.move_history: list[str] = []
 
@@ -26,24 +29,24 @@ class Chess:
         board[7, 3] = -5  # queen
         board[7, 4] = -6  # king
 
-        print(board, board.shape)
+        # print(board, board.shape)
         return board
 
     def __str__(self):
         string = "Chess Board:\n"
         pieces = {
-            1: '♙', -1: '♟',
-            2: '♗', -2: '♝',
-            3: '♘', -3: '♞',
-            4: '♖', -4: '♜',
-            5: '♕', -5: '♛',
-            6: '♔', -6: '♚'
+            -1: '♙', 1: '♟',
+            -2: '♗', 2: '♝',
+            -3: '♘', 3: '♞',
+            -4: '♖', 4: '♜',
+            -5: '♕', 5: '♛',
+            -6: '♔', 6: '♚'
         }
 
-        for i in range(len(self.board)):
-            string += f"{8 - i} | "
-            for j in range(len(self.board[i])):
-                piece = self.board[i][j]
+        for y in range(len(self.board)):
+            string += f"{8 - y} | "
+            for x in range(len(self.board[y])):
+                piece = self.board[7 - y][x]
                 if piece != 0:
                     string += pieces[piece] + " "
                 else:
