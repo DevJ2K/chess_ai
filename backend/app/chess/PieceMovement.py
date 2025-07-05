@@ -17,38 +17,37 @@ class PieceMovement:
 
         def add_move(new_x: int, new_y: int):
             nonlocal iteration
-            if is_in_board(board, new_x, new_y):
-                all_moves[iteration] = (new_x, new_y)
-                iteration += 1
+            all_moves[iteration] = (new_x, new_y)
+            iteration += 1
 
         if is_white_turn:
-            if board[y + 1, x] == 0:
+            if is_in_board(board, x, y + 1) and board[y + 1, x] == 0:
                 add_move(x, y + 1)
 
-            if y == 1\
-            and board[y + 1, x] == 0\
-            and board[y + 2, x] == 0:
+            if y == 1 \
+            and is_in_board(board, x, y + 1) and board[y + 1, x] == 0 \
+            and is_in_board(board, x, y + 2) and board[y + 2, x] == 0:
                 add_move(x, y + 2)
 
-            if board[y + 1, x + 1] < 0:
+            if is_in_board(board, x + 1, y + 1) and board[y + 1, x + 1] < 0:
                 add_move(x + 1, y + 1)
 
-            if board[y + 1, x - 1] < 0:
+            if is_in_board(board, x - 1, y + 1) and board[y + 1, x - 1] < 0:
                 add_move(x - 1, y + 1)
 
         else:
-            if board[y - 1, x] == 0:
+            if is_in_board(board, x, y - 1) and board[y - 1, x] == 0:
                 add_move(x, y - 1)
 
-            if y == 6\
-            and board[y - 1, x] == 0\
-            and board[y - 2, x] == 0:
+            if y == 6 \
+            and is_in_board(board, x, y - 1) and board[y - 1, x] == 0 \
+            and is_in_board(board, x, y - 2) and board[y - 2, x] == 0:
                 add_move(x, y - 2)
 
-            if board[y - 1, x + 1] > 0:
+            if is_in_board(board, x + 1, y - 1) and board[y - 1, x + 1] > 0:
                 add_move(x + 1, y - 1)
 
-            if board[y - 1, x - 1] > 0:
+            if is_in_board(board, x - 1, y - 1) and board[y - 1, x - 1] > 0:
                 add_move(x - 1, y - 1)
 
         return all_moves[:iteration]
@@ -87,7 +86,7 @@ if __name__ == "__main__":
     piece_movement = PieceMovement()
 
     start_time = time.time()
-    for i in range(1000):
+    for i in range(1):
         moves = piece_movement.get_pawn_movement(board, x=0, y=1, is_white_turn=True)
     end_time = time.time()
     print(f"Execution time: {end_time - start_time:.6f} seconds")
