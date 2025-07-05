@@ -132,6 +132,27 @@ class PieceMovement:
 
         return all_moves[:iteration]
 
+    @staticmethod
+    @njit
+    def get_queen_movement(board: np.ndarray, x: int, y: int):
+        NUMBER_OF_POSSIBLE_MOVES = 27
+        all_moves = np.zeros((NUMBER_OF_POSSIBLE_MOVES, 2), dtype=np.int8)
+        iteration = 0
+
+        # Combine rook and bishop movements
+        rook_moves = PieceMovement.get_rook_movement(board, x, y)
+        bishop_moves = PieceMovement.get_bishop_movement(board, x, y)
+
+        for move in rook_moves:
+            all_moves[iteration] = move
+            iteration += 1
+
+        for move in bishop_moves:
+            all_moves[iteration] = move
+            iteration += 1
+
+        return all_moves[:iteration]
+
 @njit
 def is_in_board(board: np.ndarray, x: int, y: int):
     return 0 <= x < board.shape[1] and 0 <= y < board.shape[0]
@@ -141,31 +162,28 @@ if __name__ == "__main__":
     from app.chess.Chess import Chess
     board = np.zeros((8, 8), dtype=np.int8)
 
-    # White pieces
-    board[1, :] = 1   # pawns
-    board[0, 2] = board[0, 5] = 2   # bishops
-    board[0, 1] = board[0, 6] = 3   # knights
-    board[0, 0] = board[0, 7] = 4   # rooks
-    board[0, 3] = 5   # queen
-    board[0, 4] = 6   # king
+    # # White pieces
+    # board[1, :] = 1   # pawns
+    # board[0, 2] = board[0, 5] = 2   # bishops
+    # board[0, 1] = board[0, 6] = 3   # knights
+    # board[0, 0] = board[0, 7] = 4   # rooks
+    # board[0, 3] = 5   # queen
+    # board[0, 4] = 6   # king
 
-    # Black pieces
-    board[6, :] = -1  # pawns
-    board[2, 1] = -1  # pawns
-    board[7, 2] = board[7, 5] = -2  # bishops
-    board[7, 1] = board[7, 6] = -3  # knights
-    board[7, 0] = board[7, 7] = -4  # rooks
-    board[7, 3] = -5  # queen
-    board[7, 4] = -6  # king
-
-    # print(board)
-
-
+    # # Black pieces
+    # board[6, :] = -1  # pawns
+    # board[2, 1] = -1  # pawns
+    # board[7, 2] = board[7, 5] = -2  # bishops
+    # board[7, 1] = board[7, 6] = -3  # knights
+    # board[7, 0] = board[7, 7] = -4  # rooks
+    # board[7, 3] = -5  # queen
+    # board[7, 4] = -6  # king
 
     chess = Chess(board)
 
-    piece_x, piece_y = 0, 0
-    board[piece_y, piece_x] = 4
+
+    piece_x, piece_y = 3, 3
+    board[piece_y, piece_x] = 2
 
     print(chess)
 
@@ -173,15 +191,19 @@ if __name__ == "__main__":
     start_time = time.time()
     # for i in range(1):
     # moves = piece_movement.get_pawn_movement(board, x=0, y=1, is_white_turn=True)
-    moves = piece_movement.get_rook_movement(board, x=piece_x, y=piece_y)
+    moves = piece_movement.get_queen_movement(board, x=piece_x, y=piece_y)
     end_time = time.time()
     print(f"Execution time: {end_time - start_time:.6f} seconds")
 
-    for move in moves:
-        board_copy = board.copy()
-        x, y = move
-        board_copy[y, x] = board_copy[piece_y, piece_x]
-        board_copy[piece_y, piece_x] = 0
-        print(f"Move from ({piece_x}, {piece_y}) to {move}:")
-        print(Chess(board_copy))
+    # for move in moves:
+    #     board_copy = board.copy()
+    #     x, y = move
+    #     board_copy[y, x] = board_copy[piece_y, piece_x]
+    #     board_copy[piece_y, piece_x] = 0
+    #     print(f"Move from ({piece_x}, {piece_y}) to {move}:")
+    #     print(Chess(board_copy))
 
+    for move in moves:
+        x, y = move
+        board[y, x] = 14
+    print(chess)
