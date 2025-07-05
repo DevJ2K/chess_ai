@@ -1,5 +1,5 @@
 import numpy as np
-
+from app.chess.ChessTool import ChessTool
 
 class Chess:
     def __init__(self):
@@ -27,16 +27,50 @@ class Chess:
         board[7, 4] = -6  # king
 
         print(board, board.shape)
+        return board
 
     def __str__(self):
-        pass
+        string = "Chess Board:\n"
+        pieces = {
+            1: '♙', -1: '♟',
+            2: '♗', -2: '♝',
+            3: '♘', -3: '♞',
+            4: '♖', -4: '♜',
+            5: '♕', -5: '♛',
+            6: '♔', -6: '♚'
+        }
+
+        for i in range(len(self.board)):
+            string += f"{8 - i} | "
+            for j in range(len(self.board[i])):
+                piece = self.board[i][j]
+                if piece != 0:
+                    string += pieces[piece] + " "
+                else:
+                    string += "· "
+            string += "\n"
+        string += "  | - - - - - - - -\n"
+        string += "    a b c d e f g h\n"
+        return string
 
     def apply_move(self, move: str):
         pass
 
+    def get_valid_moves(self) -> list[str]:
+        ChessTool.get_valid_moves(self.board, self.move_history)
+        # if len(self.move_history) % 2 == 0:  # White's turn
+        #     pass
+        # else:  # Black's turn
+        #     pass
+        # # for line in self.board
+        # return []
+
 
 if __name__ == "__main__":
     chess_game = Chess()
+    print(chess_game)
+    # chess_game.get_valid_moves()
+
     # example_move = "e4"
     # chess_game.apply_move(example_move)
     # print("Move applied:", example_move)
