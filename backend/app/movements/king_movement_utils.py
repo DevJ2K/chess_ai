@@ -28,7 +28,7 @@ def is_square_under_attack(board: np.ndarray, x: int, y: int, is_white_piece: bo
     for dx, dy in knight_moves:
         new_x, new_y = x + dx, y + dy
         if (is_in_board(board, new_x, new_y) and
-            board[new_y, new_x] == enemy_multiplier * 2):  # Enemy knight
+            board[new_y, new_x] == enemy_multiplier * 3):  # Enemy knight
             return True
 
     # Check for diagonal attacks (bishop, queen, king)
@@ -39,9 +39,9 @@ def is_square_under_attack(board: np.ndarray, x: int, y: int, is_white_piece: bo
         while is_in_board(board, new_x, new_y):
             piece = board[new_y, new_x]
             if piece != 0:
-                if piece == enemy_multiplier * 3:  # Enemy bishop
+                if piece == enemy_multiplier * 2:  # Enemy bishop
                     return True
-                elif piece == enemy_multiplier * 4:  # Enemy queen
+                elif piece == enemy_multiplier * 5:  # Enemy queen
                     return True
                 elif piece == enemy_multiplier * 6 and distance == 1:  # Adjacent enemy king
                     return True
@@ -58,9 +58,9 @@ def is_square_under_attack(board: np.ndarray, x: int, y: int, is_white_piece: bo
         while is_in_board(board, new_x, new_y):
             piece = board[new_y, new_x]
             if piece != 0:
-                if piece == enemy_multiplier * 5:  # Enemy rook
+                if piece == enemy_multiplier * 4:  # Enemy rook
                     return True
-                elif piece == enemy_multiplier * 4:  # Enemy queen
+                elif piece == enemy_multiplier * 5:  # Enemy queen
                     return True
                 elif piece == enemy_multiplier * 6 and distance == 1:  # Adjacent enemy king
                     return True
