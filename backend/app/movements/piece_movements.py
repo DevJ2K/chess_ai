@@ -1,6 +1,8 @@
 import numpy as np
-# import tests.configuration  # un-comment to ignore Numba JIT annotations
+import tests.configuration  # un-comment to ignore Numba JIT annotations
 from numba import njit
+from app.movements.piece_utils import is_in_board
+from app.movements.king_movement_utils import can_castle_kingside, can_castle_queenside, is_king_in_check
 
 
 def warm_up_movement():
@@ -131,6 +133,7 @@ def get_rook_movement(board: np.ndarray, x: int, y: int):
 
     return all_moves[:iteration]
 
+
 @njit
 def get_queen_movement(board: np.ndarray, x: int, y: int):
     NUMBER_OF_POSSIBLE_MOVES = 27
@@ -151,9 +154,12 @@ def get_queen_movement(board: np.ndarray, x: int, y: int):
 
     return all_moves[:iteration]
 
+
 @njit
-def get_king_movement(board: np.ndarray, x: int, y: int):
-    NUMBER_OF_POSSIBLE_MOVES = 8
+def get_king_movement(board: np.ndarray, x: int, y: int, king_has_moved: bool = False,
+                     rook_kingside_moved: bool = False, rook_queenside_moved: bool = False):
+
+    NUMBER_OF_POSSIBLE_MOVES = 10
     all_moves = np.zeros((NUMBER_OF_POSSIBLE_MOVES, 2), dtype=np.int8)
     iteration = 0
 
@@ -168,11 +174,20 @@ def get_king_movement(board: np.ndarray, x: int, y: int):
             all_moves[iteration] = (new_x, new_y)
             iteration += 1
 
+    # Check rooking (castling)
+    if not king_has_moved and not is_king_in_check(board, x, y):
+        # Rook (Kingside)
+        if can_castle_kingside(board, x, y, rook_kingside_moved):
+            all_moves[iteration] = (x + 2, y)
+            iteration += 1
+
+        # Rook (Queenside)
+        if can_castle_queenside(board, x, y, rook_queenside_moved):
+            all_moves[iteration] = (x - 2, y)
+            iteration += 1
+
     return all_moves[:iteration]
 
-@njit
-def is_in_board(board: np.ndarray, x: int, y: int):
-    return 0 <= x < board.shape[1] and 0 <= y < board.shape[0]
 
 if __name__ == "__main__":
     import time
@@ -183,7 +198,7 @@ if __name__ == "__main__":
     # board[1, :] = 1   # pawns
     # board[0, 2] = board[0, 5] = 2   # bishops
     # board[0, 1] = board[0, 6] = 3   # knights
-    # board[0, 0] = board[0, 7] = 4   # rooks
+    board[0, 0] = board[0, 7] = 4   # rooks
     # board[0, 3] = 5   # queen
     # board[0, 4] = 6   # king
 
@@ -199,8 +214,8 @@ if __name__ == "__main__":
     chess = Chess(board)
 
 
-    piece_x, piece_y = 3, 3
-    board[piece_y, piece_x] = 2
+    piece_x, piece_y = 4, 0
+    board[piece_y, piece_x] = 6
 
     print(chess)
 
@@ -208,12 +223,12 @@ if __name__ == "__main__":
     start_time = time.time()
     # for i in range(1):
     # moves = get_pawn_movement(board, x=0, y=1, is_white_turn=True)
-    get_pawn_movement(board, x=piece_x, y=piece_y, is_white_turn=True)
-    get_knight_movement(board, x=piece_x, y=piece_y)
-    get_bishop_movement(board, x=piece_x, y=piece_y)
-    get_rook_movement(board, x=piece_x, y=piece_y)
-    get_queen_movement(board, x=piece_x, y=piece_y)
-    get_king_movement(board, x=piece_x, y=piece_y)
+    # get_pawn_movement(board, x=piece_x, y=piece_y, is_white_turn=True)
+    # get_knight_movement(board, x=piece_x, y=piece_y)
+    # get_bishop_movement(board, x=piece_x, y=piece_y)
+    # get_rook_movement(board, x=piece_x, y=piece_y)
+    # get_queen_movement(board, x=piece_x, y=piece_y)
+    moves = get_king_movement(board, x=piece_x, y=piece_y)
     # moves = get_king_movement(board, x=piece_x, y=piece_y)
     end_time = time.time()
     print(f"Execution time: {end_time - start_time:.6f} seconds")
@@ -226,7 +241,7 @@ if __name__ == "__main__":
     #     print(f"Move from ({piece_x}, {piece_y}) to {move}:")
     #     print(Chess(board_copy))
 
-    # for move in moves:
-    #     x, y = move
-    #     board[y, x] = 14
-    # print(chess)
+    for move in moves:
+        x, y = move
+        board[y, x] = 14
+    print(chess)

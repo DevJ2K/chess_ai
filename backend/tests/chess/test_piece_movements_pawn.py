@@ -1,5 +1,5 @@
 import tests.configuration
-from app.chess.piece_movements import get_pawn_movement
+from app.movements.piece_movements import get_pawn_movement
 from app.chess.Chess import Chess
 import numpy as np
 

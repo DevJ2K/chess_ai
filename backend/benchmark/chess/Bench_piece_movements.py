@@ -1,5 +1,5 @@
 import numba
-from app.chess.piece_movements import warm_up_movement, get_pawn_movement
+from app.movements.piece_movements import warm_up_movement, get_pawn_movement
 from app.chess.Chess import Chess
 from benchmark.MeasureTime import MeasureTime
 
