@@ -1,5 +1,5 @@
 from app.movements.piece_movements import get_pawn_movement, get_knight_movement, get_bishop_movement, get_rook_movement, get_queen_movement, get_king_movement
-from app.chess.ChessTool import is_not_dangerous_for_king, get_valid_moves
+from app.chess.chess_tool import is_not_dangerous_for_king, get_valid_moves
 import numpy as np
 
 def warm_up_jit(

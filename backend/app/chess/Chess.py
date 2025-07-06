@@ -1,6 +1,6 @@
 import numpy as np
 import tests.configuration  # un-comment to ignore Numba JIT annotations
-from app.chess.ChessTool import get_valid_moves
+from app.chess.chess_tool import get_valid_moves
 from app.utils.Colors import REDHB, RESET
 
 class Chess:
