@@ -28,7 +28,7 @@ def warm_up_jit(
 
     get_valid_moves(
         np.zeros((8, 8), dtype=np.int8),
-        0
+        np.empty((0, 2, 3), dtype=np.int8),
     )
     is_not_dangerous_for_king(
         np.zeros((8, 8), dtype=np.int8),
