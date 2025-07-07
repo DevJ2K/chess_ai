@@ -1,5 +1,6 @@
 import numba
-from app.movements.piece_movements import warm_up_movement, get_pawn_movement
+from app.movements.piece_movements import get_pawn_movement
+from app.optimization.jit_configuration import warm_up_jit
 from app.chess.Chess import Chess
 from benchmark.MeasureTime import MeasureTime
 
@@ -7,7 +8,7 @@ from benchmark.MeasureTime import MeasureTime
 print("Numba JIT : [ON]")
 
 board = Chess.initialize_board()
-warm_up_movement()
+warm_up_jit()
 
 measureTime = MeasureTime(start=True)
 get_pawn_movement(board, x=0, y=1, is_white_turn=True)

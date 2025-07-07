@@ -1,18 +1,8 @@
 import numpy as np
-import tests.configuration  # un-comment to ignore Numba JIT annotations
 from numba import njit
 from app.movements.piece_utils import is_in_board
 from app.movements.king_movement_utils import can_castle_kingside, can_castle_queenside, is_king_in_check
 
-
-def warm_up_movement():
-    # WARMUP Numba JIT compilation
-    get_pawn_movement(np.zeros((8, 8), dtype=np.int8), 0, 0, True)
-    get_knight_movement(np.zeros((8, 8), dtype=np.int8), 0, 0)
-    get_bishop_movement(np.zeros((8, 8), dtype=np.int8), 0, 0)
-    get_rook_movement(np.zeros((8, 8), dtype=np.int8), 0, 0)
-    get_queen_movement(np.zeros((8, 8), dtype=np.int8), 0, 0)
-    get_king_movement(np.zeros((8, 8), dtype=np.int8), 0, 0)
 
 @njit
 def get_pawn_movement(board: np.ndarray, x: int, y: int, is_white_turn: bool):
@@ -192,6 +182,7 @@ def get_king_movement(board: np.ndarray, x: int, y: int, king_has_moved: bool = 
 if __name__ == "__main__":
     import time
     from app.chess.Chess import Chess
+    from app.optimization.jit_configuration import warm_up_jit
     board = np.zeros((8, 8), dtype=np.int8)
 
     # # White pieces
@@ -213,13 +204,14 @@ if __name__ == "__main__":
 
     chess = Chess(board)
 
+    warm_up_jit(warmup_movement=True)
+
 
     piece_x, piece_y = 4, 0
     board[piece_y, piece_x] = 6
 
     print(chess)
 
-    warm_up_movement()
     start_time = time.time()
     # for i in range(1):
     # moves = get_pawn_movement(board, x=0, y=1, is_white_turn=True)

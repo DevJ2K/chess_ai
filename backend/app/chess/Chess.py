@@ -1,6 +1,6 @@
 import numpy as np
-import tests.configuration  # un-comment to ignore Numba JIT annotations
-from app.chess.chess_tool import get_valid_moves
+# import tests.configuration  # un-comment to ignore Numba JIT annotations
+from app.movements.get_movements import get_valid_moves
 from app.utils.Colors import REDHB, RESET
 
 class Chess:
@@ -73,11 +73,9 @@ class Chess:
 if __name__ == "__main__":
     chess_game = Chess()
     from benchmark.MeasureTime import MeasureTime
-    # from app.movements.piece_movements import warm_up_movement
     from app.optimization.jit_configuration import warm_up_jit
-    # warm_up_movement()
 
-    # warm_up_jit()
+    warm_up_jit()
 
     print(chess_game)
     measureTime = MeasureTime(start=True)
