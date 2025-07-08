@@ -1,4 +1,5 @@
 import numpy as np
+import re
 import tests.configuration  # un-comment to ignore Numba JIT annotations
 from app.movements.get_movements import get_valid_moves
 from app.utils.Colors import REDHB, RESET
@@ -30,7 +31,7 @@ class Chess:
 
     @staticmethod
     def initialize_board() -> np.ndarray:
-        return chess_preset_default()
+        return chess_preset_promotion()
 
     def __str__(self):
         return Chess.board_to_str(self.board)
@@ -73,7 +74,11 @@ class Chess:
         if move_representation not in moves:
             raise ValueError(f"Invalid move: {move_representation}. Available moves: {list(moves.keys())}")
 
-        self.apply_move(moves[move_representation])
+        promotion_str = re.search(r"=(\w)", move_representation)
+        promotion = 5
+        if promotion_str:
+            promotion = {'Q': 5, 'R': 4, 'B': 3, 'N': 2}.get(promotion_str.group(1), 5)
+        apply_move(self.board, moves[move_representation], promotion=promotion)
         self.move_history = np.append(self.move_history, np.expand_dims(moves[move_representation], axis=0), axis=0)
         if move_representation.endswith('#'):
             print("Checkmate! Game over.")
@@ -81,10 +86,6 @@ class Chess:
         elif move_representation.endswith('='):
             print("Draw! No valid moves left for the opponent.")
             return True
-
-
-    def apply_move(self, move: np.ndarray) -> bool:
-        return apply_move(self.board, move, promotion=5)  # si y'a une promotion, on la met à 5 (reine)
 
     def get_valid_moves(self) -> dict[str, np.ndarray]:
         moves = get_valid_moves(self.board, np.array(self.move_history, dtype=np.int8))
@@ -239,25 +240,25 @@ if __name__ == "__main__":
     import time
     import os
     chess_game = Chess()
-    iteration = 0
-    for move in GAME:
-        chess_game.apply_move_str(move)
-        print(chess_game)
-        print(f"Tuple number: {iteration // 2}/{len(GAME) / 2}")
-        iteration += 1
-        time.sleep(0.2)
-        os.system('clear')
-    print(chess_game)
+    # iteration = 0
+    # for move in GAME:
+    #     chess_game.apply_move_str(move)
+    #     print(chess_game)
+    #     print(f"Tuple number: {iteration // 2}/{len(GAME) / 2}")
+    #     iteration += 1
+    #     time.sleep(0.2)
+    #     os.system('clear')
+    # print(chess_game)
 
             # print(f"Failed to apply move: {move}")
             # break
-    # while True:
-    #     print(chess_game)
-    #     user_input = input("Enter your move (or 'exit' to quit): ")
-    #     if user_input.lower() in ['exit', 'quit', 'q']:
-    #         break
-    #     if chess_game.apply_move_str(user_input):
-    #         break
+    while True:
+        print(chess_game)
+        user_input = input("Enter your move (or 'exit' to quit): ")
+        if user_input.lower() in ['exit', 'quit', 'q']:
+            break
+        if chess_game.apply_move_str(user_input):
+            break
     # print(chess_game)
 
     # print(chess_game)
