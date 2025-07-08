@@ -12,19 +12,19 @@ def apply_move(board: np.ndarray, move: np.ndarray, promotion: np.int8) -> bool:
     # Handle castling
     #################################
     if piece == 6 and (start_x, start_y) == (4, 0) and (dest_x, dest_y) == (6, 0):
-        print("White Castling queenside detected!")
+        print("White Castling kingside detected!")
         board[0, 7] = 0
         board[0, 5] = 4
     elif piece == 6 and (start_x, start_y) == (4, 0) and (dest_x, dest_y) == (2, 0):
-        print("White Castling kingside detected!")
+        print("White Castling queenside detected!")
         board[0, 0] = 0
         board[0, 3] = 4
     elif piece == -6 and (start_x, start_y) == (4, 7) and (dest_x, dest_y) == (6, 7):
-        print("Black Castling queenside detected!")
+        print("Black Castling kingside detected!")
         board[7, 7] = 0
         board[7, 5] = -4
     elif piece == -6 and (start_x, start_y) == (4, 7) and (dest_x, dest_y) == (2, 7):
-        print("Black Castling kingside detected!")
+        print("Black Castling queenside detected!")
         board[7, 0] = 0
         board[7, 3] = -4
 
