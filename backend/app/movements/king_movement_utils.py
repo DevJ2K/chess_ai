@@ -11,8 +11,7 @@ def is_king_in_check(board: np.ndarray, king_x: int, king_y: int):
 def is_square_under_attack(board: np.ndarray, x: int, y: int, is_white_piece: bool):
     enemy_multiplier = -1 if is_white_piece else 1
 
-    # Check for pawn attacks
-    pawn_direction = -1 if is_white_piece else 1
+    pawn_direction = 1 if is_white_piece else -1
     for dx in [-1, 1]:
         new_x, new_y = x + dx, y + pawn_direction
         if (is_in_board(board, new_x, new_y) and
