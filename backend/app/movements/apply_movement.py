@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def apply_move(board: np.ndarray, move: np.ndarray, promotion: np.int8) -> bool:
     if move.shape != (2, 3):
         print(f"Invalid move shape: {move.shape}. Expected (2, 3).")

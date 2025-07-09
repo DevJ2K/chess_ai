@@ -6,19 +6,19 @@ from app.utils.Colors import REDHB, RESET
 from app.chess.ChessPresets import ChessPresets
 from app.movements.movement_representation import move_to_str
 from app.movements.apply_movement import apply_move
-from app.movements.king_movement_utils import is_king_in_check
 from app.state.king_status import get_king_status
+
 
 class Chess:
 
     PIECES = {
-            0: '·', 14: REDHB + '?' + RESET, 15: ' ',
-            -1: '♙', 1: '♟',
-            -2: '♗', 2: '♝',
-            -3: '♘', 3: '♞',
-            -4: '♖', 4: '♜',
-            -5: '♕', 5: '♛',
-            -6: '♔', 6: '♚'
+        0: '·', 14: REDHB + '?' + RESET, 15: ' ',
+        -1: '♙', 1: '♟',
+        -2: '♗', 2: '♝',
+        -3: '♘', 3: '♞',
+        -4: '♖', 4: '♜',
+        -5: '♕', 5: '♛',
+        -6: '♔', 6: '♚'
     }
 
     def __init__(self, board: np.ndarray = None):
@@ -27,7 +27,7 @@ class Chess:
         else:
             self.board: np.ndarray = Chess.initialize_board()
         self.move_history: np.ndarray = np.empty((0, 2, 3), dtype=np.int8)
-        # self.move_history = np.append(self.move_history, np.array([[[0, 0, 0], [0, 0, 0]]], dtype=np.int8), axis=0)
+        self.move_history_str: list[str] = []
 
     @staticmethod
     def initialize_board() -> np.ndarray:
@@ -68,7 +68,6 @@ class Chess:
             board[dest_y, dest_x] = captured_piece
             print(Chess.board_to_str(board))
 
-
     def apply_move_str(self, move_representation: str) -> bool:
         moves = self.get_valid_moves()
         if move_representation not in moves:
@@ -79,7 +78,10 @@ class Chess:
         if promotion_str:
             promotion = {'Q': 5, 'R': 4, 'B': 3, 'N': 2}.get(promotion_str.group(1), 5)
         apply_move(self.board, moves[move_representation], promotion=promotion)
+
         self.move_history = np.append(self.move_history, np.expand_dims(moves[move_representation], axis=0), axis=0)
+        self.move_history_str.append(move_representation)
+
         if move_representation.endswith('#'):
             print("Checkmate! Game over.")
             return True
@@ -100,19 +102,12 @@ class Chess:
             if after_move_board is None:
                 continue
 
-
             king_value = 6 if (len(self.move_history) + 1) % 2 == 0 else -6
 
             positions = np.where(after_move_board == king_value)
             if len(positions[0]) > 0:
                 y, x = positions[0][0], positions[1][0]
 
-                # result_king_in_check = 1 if is_king_in_check(after_move_board, x, y) else 0
-                # result_number_of_moves = 1 if len(get_valid_moves(after_move_board, np.append(self.move_history, np.expand_dims(move, axis=0), axis=0))) > 0 else 0
-
-                # moves_after_move = get_valid_moves(after_move_board, np.array(np.append(self.move_history, np.expand_dims(move, axis=0), axis=0), dtype=np.int8))
-
-                # opponent_king_status[i] = np.array([result_king_in_check, result_number_of_moves], dtype=np.int8)
                 opponent_king_status[i] = get_king_status(after_move_board, self.move_history, move, x, y)
                 # Chess.display_move(move, display_schema=False)
                 # print(Chess(after_move_board))
@@ -120,10 +115,6 @@ class Chess:
                 str_moves = move_to_str(after_move_board, move, opponent_king_status[i])
                 for str_move in str_moves:
                     all_str_moves.append([str_move, move])
-                # print(f"Move {i + 1}/{len(moves)}: {str_moves}")
-                # print()
-                # print()
-                # print(opponent_king_status[i])
 
         counts = {}
         for row in all_str_moves:
@@ -132,16 +123,6 @@ class Chess:
         # Garder ceux qui apparaissent une seule fois en première colonne
         filter_moves = [row for row in all_str_moves if counts[row[0]] == 1]
         return {k: v for k, v in filter_moves}
-        # print(f"Opponent king status: {opponent_king_status}")
-
-
-
-            # Check if the opponent's king is in check after this move
-            # is
-
-
-            # if move[0, 2] == 6:
-            #     Chess.display_move(move, display_schema=False)
 
     def __simulate_move__(self, move: np.ndarray) -> np.ndarray:
         """
@@ -157,8 +138,9 @@ class Chess:
 
         return new_board
 
+
 if __name__ == "__main__":
-    from benchmark.MeasureTime import MeasureTime
+    # from benchmark.MeasureTime import MeasureTime
     from app.optimization.jit_configuration import warm_up_jit
 
     # measureTime = MeasureTime(start=True)
@@ -194,71 +176,69 @@ if __name__ == "__main__":
 #     "Bf1", "Ng2#"
 # ]
     GAME = [
-    "e4", "e5",
-    "Nf3", "Nf6",
-    "d3", "Nc6",
-    "g3", "Bb4+",
-    "c3", "Ba5",
-    "b4", "Bb6",
-    "Bh3", "g5",
-    "Nxg5", "Qe7",
-    "Ba3", "d5",
-    "b5", "Bxh3",
-    "Bxe7", "Kxe7",
-    "Nxh3", "Rhg8",
-    "O-O", "Ng4",
-    "exd5", "Na5",
-    "d4", "Rad8",
-    "Re1", "Rg6",
-    "dxe5", "c6",
-    "Nf4", "Rh6",
-    "d6+", "Kf8",
-    "e6", "Rxh2",
-    "Qxg4", "Bxf2+",
-    "Kxh2", "Nc4",
-    "e7+", "Ke8",
-    "Rd1", "Ne5",
-    "d7+", "Rxd7",
-    "Qh3", "Rxd1",
-    "Qc8+", "Kxe7",
-    "Kh3", "Rh1+",
-    "Kg2", "Ng4",
-    "Kxh1", "Bxg3",
-    "Qxg4", "Bf2",
-    "Na3", "h5",
-    "Qe2+", "Kf8",
-    "Qxf2", "f6",
-    "Nxh5", "f5",
-    "Qxf5+", "Ke8",
-    "bxc6", "Kd8",
-    "cxb7", "Kc7",
-    "Rb1", "a6",
-    "b8=Q+", "Kc6",
-    "Rb6#"
-]
+        "e4", "e5",
+        "Nf3", "Nf6",
+        "d3", "Nc6",
+        "g3", "Bb4+",
+        "c3", "Ba5",
+        "b4", "Bb6",
+        "Bh3", "g5",
+        "Nxg5", "Qe7",
+        "Ba3", "d5",
+        "b5", "Bxh3",
+        "Bxe7", "Kxe7",
+        "Nxh3", "Rhg8",
+        "O-O", "Ng4",
+        "exd5", "Na5",
+        "d4", "Rad8",
+        "Re1", "Rg6",
+        "dxe5", "c6",
+        "Nf4", "Rh6",
+        "d6+", "Kf8",
+        "e6", "Rxh2",
+        "Qxg4", "Bxf2+",
+        "Kxh2", "Nc4",
+        "e7+", "Ke8",
+        "Rd1", "Ne5",
+        "d7+", "Rxd7",
+        "Qh3", "Rxd1",
+        "Qc8+", "Kxe7",
+        "Kh3", "Rh1+",
+        "Kg2", "Ng4",
+        "Kxh1", "Bxg3",
+        "Qxg4", "Bf2",
+        "Na3", "h5",
+        "Qe2+", "Kf8",
+        "Qxf2", "f6",
+        "Nxh5", "f5",
+        "Qxf5+", "Ke8",
+        "bxc6", "Kd8",
+        "cxb7", "Kc7",
+        "Rb1", "a6",
+        "b8=Q+", "Kc6",
+        "Rb6#"
+    ]
 
     import time
     import os
     chess_game = Chess()
-    # iteration = 0
-    # for move in GAME:
-    #     chess_game.apply_move_str(move)
-    #     print(chess_game)
-    #     print(f"Tuple number: {iteration // 2}/{len(GAME) / 2}")
-    #     iteration += 1
-    #     time.sleep(0.2)
-    #     os.system('clear')
-    # print(chess_game)
-
-            # print(f"Failed to apply move: {move}")
-            # break
-    while True:
+    iteration = 0
+    for move in GAME:
+        chess_game.apply_move_str(move)
         print(chess_game)
-        user_input = input("Enter your move (or 'exit' to quit): ")
-        if user_input.lower() in ['exit', 'quit', 'q']:
-            break
-        if chess_game.apply_move_str(user_input):
-            break
+        print(f"Tuple number: {iteration // 2}/{len(GAME) / 2}")
+        iteration += 1
+        # time.sleep(0.2)
+        os.system('clear')
+    print(chess_game)
+
+    # while True:
+    #     print(chess_game)
+    #     user_input = input("Enter your move (or 'exit' to quit): ")
+    #     if user_input.lower() in ['exit', 'quit', 'q']:
+    #         break
+    #     if chess_game.apply_move_str(user_input):
+    #         break
     # print(chess_game)
 
     # print(chess_game)

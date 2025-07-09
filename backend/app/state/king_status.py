@@ -3,6 +3,7 @@ from app.movements.get_movements import get_valid_moves
 from app.movements.king_movement_utils import is_king_in_check
 import numpy as np
 
+
 @njit
 def get_king_status(board: np.ndarray, move_history: np.ndarray, move: np.ndarray, x: int, y: int) -> int:
     """

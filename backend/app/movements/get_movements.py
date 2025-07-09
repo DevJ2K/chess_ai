@@ -54,6 +54,7 @@ def get_valid_moves(board: np.ndarray, move_history: np.ndarray) -> np.ndarray:
 
     return possible_moves[:iteration]
 
+
 @njit
 def is_not_dangerous_for_king(board: np.ndarray, initial_pos: np.ndarray, new_pos: np.ndarray, is_white_turn: bool) -> bool:
     initial_x, initial_y = initial_pos
@@ -91,8 +92,8 @@ if __name__ == "__main__":
         from app.optimization.jit_configuration import warm_up_jit
         warm_up_jit()
         get_valid_moves(
-        np.zeros((8, 8), dtype=np.int8),
-        0
+            np.zeros((8, 8), dtype=np.int8),
+            0
         )
         is_not_dangerous_for_king(
             np.zeros((8, 8), dtype=np.int8),

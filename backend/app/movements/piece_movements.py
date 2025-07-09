@@ -21,8 +21,8 @@ def get_pawn_movement(board: np.ndarray, x: int, y: int, is_white_turn: bool):
             add_move(x, y + 1)
 
         if y == 1 \
-        and is_in_board(board, x, y + 1) and board[y + 1, x] == 0 \
-        and is_in_board(board, x, y + 2) and board[y + 2, x] == 0:
+            and is_in_board(board, x, y + 1) and board[y + 1, x] == 0 \
+                and is_in_board(board, x, y + 2) and board[y + 2, x] == 0:
             add_move(x, y + 2)
 
         if is_in_board(board, x + 1, y + 1) and board[y + 1, x + 1] < 0:
@@ -36,8 +36,8 @@ def get_pawn_movement(board: np.ndarray, x: int, y: int, is_white_turn: bool):
             add_move(x, y - 1)
 
         if y == 6 \
-        and is_in_board(board, x, y - 1) and board[y - 1, x] == 0 \
-        and is_in_board(board, x, y - 2) and board[y - 2, x] == 0:
+            and is_in_board(board, x, y - 1) and board[y - 1, x] == 0 \
+                and is_in_board(board, x, y - 2) and board[y - 2, x] == 0:
             add_move(x, y - 2)
 
         if is_in_board(board, x + 1, y - 1) and board[y - 1, x + 1] > 0:
@@ -47,6 +47,7 @@ def get_pawn_movement(board: np.ndarray, x: int, y: int, is_white_turn: bool):
             add_move(x - 1, y - 1)
 
     return all_moves[:iteration]
+
 
 @njit
 def get_bishop_movement(board: np.ndarray, x: int, y: int):
@@ -83,10 +84,9 @@ def get_knight_movement(board: np.ndarray, x: int, y: int):
     iteration = 0
 
     knight_moves = np.array([
-        (1, 2),(2, 1), (2, -1), (1, -2),
+        (1, 2), (2, 1), (2, -1), (1, -2),
         (-1, -2), (-2, -1), (-2, 1), (-1, 2)
     ], dtype=np.int8)
-
 
     for dx, dy in knight_moves:
         new_x, new_y = x + dx, y + dy
@@ -95,6 +95,7 @@ def get_knight_movement(board: np.ndarray, x: int, y: int):
             iteration += 1
 
     return all_moves[:iteration]
+
 
 @njit
 def get_rook_movement(board: np.ndarray, x: int, y: int):
@@ -147,7 +148,7 @@ def get_queen_movement(board: np.ndarray, x: int, y: int):
 
 @njit
 def get_king_movement(board: np.ndarray, x: int, y: int, king_has_moved: bool = False,
-                     rook_kingside_moved: bool = False, rook_queenside_moved: bool = False):
+                      rook_kingside_moved: bool = False, rook_queenside_moved: bool = False):
 
     NUMBER_OF_POSSIBLE_MOVES = 10
     all_moves = np.zeros((NUMBER_OF_POSSIBLE_MOVES, 2), dtype=np.int8)
@@ -205,7 +206,6 @@ if __name__ == "__main__":
     chess = Chess(board)
 
     warm_up_jit(warmup_movement=True)
-
 
     piece_x, piece_y = 4, 0
     board[piece_y, piece_x] = 6

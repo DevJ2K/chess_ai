@@ -2,6 +2,7 @@ from app.utils.Colors import BHMAG, BHGREEN, RESET
 from time import time
 import numpy as np
 
+
 def warm_up_jit(
         warmup_movement: bool = True):
     # WARMUP Numba JIT compilation
