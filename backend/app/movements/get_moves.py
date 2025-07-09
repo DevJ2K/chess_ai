@@ -1,7 +1,7 @@
 import numpy as np
 from numba import njit
-from app.movements.king_movement_utils import is_king_in_check
-from app.movements.piece_movements import get_pawn_movement, get_knight_movement, get_bishop_movement, get_rook_movement, get_queen_movement, get_king_movement
+from app.state.king import is_king_in_check
+from app.movements.piece_moves import get_pawn_moves, get_knight_moves, get_bishop_moves, get_rook_moves, get_queen_moves, get_king_moves
 
 
 @njit
@@ -24,26 +24,39 @@ def get_valid_moves(board: np.ndarray, move_history: np.ndarray) -> np.ndarray:
         abs_piece = abs(piece)
 
         if abs_piece == 1:
-            moves = get_pawn_movement(board, x, y, is_white_turn)
+            moves = get_pawn_moves(board, x, y, is_white_turn)
         elif abs_piece == 2:
-            moves = get_bishop_movement(board, x, y)
+            moves = get_bishop_moves(board, x, y)
         elif abs_piece == 3:
-            moves = get_knight_movement(board, x, y)
+            moves = get_knight_moves(board, x, y)
         elif abs_piece == 4:
-            moves = get_rook_movement(board, x, y)
+            moves = get_rook_moves(board, x, y)
         elif abs_piece == 5:
-            moves = get_queen_movement(board, x, y)
+            moves = get_queen_moves(board, x, y)
         elif abs_piece == 6:
-            moves = get_king_movement(board, x, y, False, False, False)
+
+            if piece > 0:  # White
+                default_queenside_rook = np.array([0, 0, 4], dtype=np.int8)
+                default_kingside_rook = np.array([7, 0, 4], dtype=np.int8)
+                default_king_position = np.array([4, 0, 6], dtype=np.int8)
+            else:  # Black
+                default_queenside_rook = np.array([0, 7, -4], dtype=np.int8)
+                default_kingside_rook = np.array([7, 7, -4], dtype=np.int8)
+                default_king_position = np.array([4, 7, -6], dtype=np.int8)
+
+            moves = get_king_moves(
+                board, x, y,
+                king_has_moved=is_move_startswith(move_history, default_king_position),
+                rook_kingside_moved=is_move_startswith(move_history, default_kingside_rook),
+                rook_queenside_moved=is_move_startswith(move_history, default_queenside_rook)
+            )
         else:
             continue
 
-        # print(f"Piece: {piece}, Moves: {moves.shape[0]}, List: {moves}")
-
         for move in moves:
-            # from app.chess.Chess import Chess
-            # print(f"Piece: {Chess.PIECES[piece]}, Move: {move}")
+
             dest_x, dest_y = move
+
             if is_not_dangerous_for_king(board, np.array([x, y]), np.array([dest_x, dest_y]), is_white_turn):
                 possible_moves[iteration, 0] = [x, y, piece]
                 possible_moves[iteration, 1] = [dest_x, dest_y, board[dest_y, dest_x]]
@@ -53,6 +66,20 @@ def get_valid_moves(board: np.ndarray, move_history: np.ndarray) -> np.ndarray:
                     break
 
     return possible_moves[:iteration]
+
+
+@njit
+def is_move_startswith(data: np.ndarray, initial_move: np.ndarray) -> bool:
+    for i in range(data.shape[0]):
+        row_match = True
+        for j in range(initial_move.shape[0]):
+            if data[i, 0, j] != initial_move[j]:
+                row_match = False
+                break
+        if row_match:
+            return True
+    return False
+
 
 @njit
 def is_not_dangerous_for_king(board: np.ndarray, initial_pos: np.ndarray, new_pos: np.ndarray, is_white_turn: bool) -> bool:
@@ -91,8 +118,8 @@ if __name__ == "__main__":
         from app.optimization.jit_configuration import warm_up_jit
         warm_up_jit()
         get_valid_moves(
-        np.zeros((8, 8), dtype=np.int8),
-        0
+            np.zeros((8, 8), dtype=np.int8),
+            0
         )
         is_not_dangerous_for_king(
             np.zeros((8, 8), dtype=np.int8),
