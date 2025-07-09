@@ -1,5 +1,4 @@
 import numpy as np
-from app.movements.apply_movement import apply_move
 
 PIECE = {
     0: '',
@@ -34,13 +33,6 @@ def move_to_str(board: np.ndarray, move: np.ndarray, opponent_king_status: np.nd
 
     dest_col = chr(ord('a') + dest_x)
     dest_row = str(dest_y + 1)
-
-    if dest_col == "d" and dest_row == "6":
-        print("DEBUG: Move to d6 detected")
-        apply_move(board, move, 0)  # Apply the move without promotion
-        from app.chess.Chess import Chess
-        print(Chess.board_to_str(board))
-        print(opponent_king_status)
 
     # GAME STATE
     is_capture = dest_piece != 0 and piece * dest_piece < 0

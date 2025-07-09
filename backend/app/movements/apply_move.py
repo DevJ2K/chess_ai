@@ -4,7 +4,6 @@ from app.movements.MoveResult import MoveResult
 
 def apply_move(board: np.ndarray, move: np.ndarray, promotion: np.int8) -> MoveResult:
     if move.shape != (2, 3):
-        print(f"Invalid move shape: {move.shape}. Expected (2, 3).")
         return MoveResult.INVALID_SHAPE
 
     start_x, start_y, piece = move[0]

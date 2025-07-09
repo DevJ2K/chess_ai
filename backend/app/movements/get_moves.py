@@ -1,6 +1,6 @@
 import numpy as np
 from numba import njit
-from app.movements.king_movement_utils import is_king_in_check
+from app.state.king import is_king_in_check
 from app.movements.piece_moves import get_pawn_moves, get_knight_moves, get_bishop_moves, get_rook_moves, get_queen_moves, get_king_moves
 
 
@@ -44,18 +44,19 @@ def get_valid_moves(board: np.ndarray, move_history: np.ndarray) -> np.ndarray:
                 default_kingside_rook = np.array([7, 7, -4], dtype=np.int8)
                 default_king_position = np.array([4, 7, -6], dtype=np.int8)
 
-            moves = get_king_moves(board, x, y,
-                                    king_has_moved=np.any(np.all(move_history[:, 0] == default_king_position, axis=1)),
-                                    rook_kingside_moved=np.any(np.all(move_history[:, 0] == default_kingside_rook, axis=1)),
-                                    rook_queenside_moved=np.any(np.all(move_history[:, 0] == default_queenside_rook, axis=1))
-                                )
+            moves = get_king_moves(
+                board, x, y,
+                king_has_moved=is_move_startswith(move_history, default_king_position),
+                rook_kingside_moved=is_move_startswith(move_history, default_kingside_rook),
+                rook_queenside_moved=is_move_startswith(move_history, default_queenside_rook)
+            )
         else:
             continue
 
         for move in moves:
 
             dest_x, dest_y = move
-            
+
             if is_not_dangerous_for_king(board, np.array([x, y]), np.array([dest_x, dest_y]), is_white_turn):
                 possible_moves[iteration, 0] = [x, y, piece]
                 possible_moves[iteration, 1] = [dest_x, dest_y, board[dest_y, dest_x]]
@@ -65,6 +66,19 @@ def get_valid_moves(board: np.ndarray, move_history: np.ndarray) -> np.ndarray:
                     break
 
     return possible_moves[:iteration]
+
+
+@njit
+def is_move_startswith(data: np.ndarray, initial_move: np.ndarray) -> bool:
+    for i in range(data.shape[0]):
+        row_match = True
+        for j in range(initial_move.shape[0]):
+            if data[i, 0, j] != initial_move[j]:
+                row_match = False
+                break
+        if row_match:
+            return True
+    return False
 
 
 @njit

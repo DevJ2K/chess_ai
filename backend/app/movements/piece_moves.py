@@ -1,7 +1,8 @@
 import numpy as np
 from numba import njit
 from app.movements.piece_utils import is_in_board
-from app.movements.king_movement_utils import can_castle_kingside, can_castle_queenside, is_king_in_check
+from app.movements.king_movement_utils import can_castle_kingside, can_castle_queenside
+from app.state.king import is_king_in_check
 
 
 @njit
@@ -147,7 +148,7 @@ def get_queen_moves(board: np.ndarray, x: int, y: int):
 
 @njit
 def get_king_moves(board: np.ndarray, x: int, y: int, king_has_moved: bool = False,
-                      rook_kingside_moved: bool = False, rook_queenside_moved: bool = False):
+                   rook_kingside_moved: bool = False, rook_queenside_moved: bool = False):
 
     NUMBER_OF_POSSIBLE_MOVES = 10
     all_moves = np.zeros((NUMBER_OF_POSSIBLE_MOVES, 2), dtype=np.int8)

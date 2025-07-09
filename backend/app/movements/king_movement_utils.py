@@ -4,12 +4,6 @@ from app.movements.piece_utils import is_in_board
 
 
 @njit
-def is_king_in_check(board: np.ndarray, king_x: int, king_y: int):
-    is_white_king = board[king_y, king_x] > 0
-    return is_square_under_attack(board, king_x, king_y, is_white_king)
-
-
-@njit
 def is_square_under_attack(board: np.ndarray, x: int, y: int, is_white_piece: bool):
     enemy_multiplier = -1 if is_white_piece else 1
 
