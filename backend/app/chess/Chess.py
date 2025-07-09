@@ -3,7 +3,7 @@ import re
 import tests.configuration  # un-comment to ignore Numba JIT annotations
 from app.movements.get_movements import get_valid_moves
 from app.utils.Colors import REDHB, RESET
-from app.utils.chess_presets import chess_preset_default, chess_preset_white_rook, chess_preset_promotion, chess_preset_promotion_mat, chess_preset_draw
+from app.chess.ChessPresets import ChessPresets
 from app.movements.movement_representation import move_to_str
 from app.movements.apply_movement import apply_move
 from app.movements.king_movement_utils import is_king_in_check
@@ -31,7 +31,7 @@ class Chess:
 
     @staticmethod
     def initialize_board() -> np.ndarray:
-        return chess_preset_promotion()
+        return ChessPresets.default()
 
     def __str__(self):
         return Chess.board_to_str(self.board)
