@@ -1,5 +1,5 @@
 from numba import njit
-from app.movements.get_movements import get_valid_moves
+from app.movements.get_moves import get_valid_moves
 from app.movements.king_movement_utils import is_king_in_check
 import numpy as np
 

@@ -1,11 +1,11 @@
 import numpy as np
 import re
 import tests.configuration  # un-comment to ignore Numba JIT annotations
-from app.movements.get_movements import get_valid_moves
+from app.movements.get_moves import get_valid_moves
 from app.utils.Colors import REDHB, RESET
 from app.chess.ChessPresets import ChessPresets
 from app.movements.movement_representation import move_to_str
-from app.movements.apply_movement import apply_move
+from app.movements.apply_move import apply_move
 from app.state.king_status import get_king_status
 
 
@@ -109,8 +109,6 @@ class Chess:
                 y, x = positions[0][0], positions[1][0]
 
                 opponent_king_status[i] = get_king_status(after_move_board, self.move_history, move, x, y)
-                # Chess.display_move(move, display_schema=False)
-                # print(Chess(after_move_board))
 
                 str_moves = move_to_str(after_move_board, move, opponent_king_status[i])
                 for str_move in str_moves:
@@ -231,6 +229,7 @@ if __name__ == "__main__":
         # time.sleep(0.2)
         os.system('clear')
     print(chess_game)
+    print(chess_game.move_history_str == GAME)
 
     # while True:
     #     print(chess_game)

@@ -10,22 +10,22 @@ def warm_up_jit(
     start_time = time()
 
     # ====================================================
-    from app.movements.piece_movements import (
-        get_pawn_movement, get_knight_movement, get_bishop_movement,
-        get_rook_movement, get_queen_movement, get_king_movement)
+    from app.movements.piece_moves import (
+        get_pawn_moves, get_knight_moves, get_bishop_moves,
+        get_rook_moves, get_queen_moves, get_king_moves)
 
     if warmup_movement:
-        get_pawn_movement(np.zeros((8, 8), dtype=np.int8), 0, 0, True)
-        get_knight_movement(np.zeros((8, 8), dtype=np.int8), 0, 0)
-        get_bishop_movement(np.zeros((8, 8), dtype=np.int8), 0, 0)
-        get_rook_movement(np.zeros((8, 8), dtype=np.int8), 0, 0)
-        get_queen_movement(np.zeros((8, 8), dtype=np.int8), 0, 0)
-        get_king_movement(np.zeros((8, 8), dtype=np.int8), 0, 0)
+        get_pawn_moves(np.zeros((8, 8), dtype=np.int8), 0, 0, True)
+        get_knight_moves(np.zeros((8, 8), dtype=np.int8), 0, 0)
+        get_bishop_moves(np.zeros((8, 8), dtype=np.int8), 0, 0)
+        get_rook_moves(np.zeros((8, 8), dtype=np.int8), 0, 0)
+        get_queen_moves(np.zeros((8, 8), dtype=np.int8), 0, 0)
+        get_king_moves(np.zeros((8, 8), dtype=np.int8), 0, 0)
     # ====================================================
     #
     # ====================================================
     # from app.movements.get_movements import is_not_dangerous_for_king, get_valid_moves
-    from app.movements.get_movements import is_not_dangerous_for_king, get_valid_moves
+    from app.movements.get_moves import is_not_dangerous_for_king, get_valid_moves
 
     get_valid_moves(
         np.zeros((8, 8), dtype=np.int8),
