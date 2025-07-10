@@ -31,6 +31,9 @@ def njit_functions(directory):
                         print(f"⚠️ SyntaxError dans {filename} (ignoré)")
     return functions
 
+def get_board() -> np.ndarray:
+    return np.zeros((8, 8), dtype=np.int8)
+
 def warm_up_jit():
     # WARMUP Numba JIT compilation
     functions_to_warm_up = njit_functions(Path(__file__).resolve().parent.parent)
@@ -50,12 +53,12 @@ def warm_up_jit():
         get_rook_moves, get_queen_moves, get_king_moves)
     filename_test = "piece_moves"
 
-    get_pawn_moves(np.zeros((8, 8), dtype=np.int8), 0, 0, True), test("get_pawn_moves")
-    get_knight_moves(np.zeros((8, 8), dtype=np.int8), 0, 0), test("get_knight_moves")
-    get_bishop_moves(np.zeros((8, 8), dtype=np.int8), 0, 0), test("get_bishop_moves")
-    get_rook_moves(np.zeros((8, 8), dtype=np.int8), 0, 0), test("get_rook_moves")
-    get_queen_moves(np.zeros((8, 8), dtype=np.int8), 0, 0), test("get_queen_moves")
-    get_king_moves(np.zeros((8, 8), dtype=np.int8), 0, 0, False, False, False), test("get_king_moves")
+    get_pawn_moves(get_board(), 0, 0, True), test("get_pawn_moves")
+    get_knight_moves(get_board(), 0, 0), test("get_knight_moves")
+    get_bishop_moves(get_board(), 0, 0), test("get_bishop_moves")
+    get_rook_moves(get_board(), 0, 0), test("get_rook_moves")
+    get_queen_moves(get_board(), 0, 0), test("get_queen_moves")
+    get_king_moves(get_board(), 0, 0, False, False, False), test("get_king_moves")
     # ====================================================
     #
     # ====================================================
@@ -63,11 +66,11 @@ def warm_up_jit():
     filename_test = "get_moves"
 
     get_valid_moves(
-        np.zeros((8, 8), dtype=np.int8),
+        get_board(),
         np.empty((0, 2, 3), dtype=np.int8),
     ), test("get_valid_moves")
     is_not_dangerous_for_king(
-        np.zeros((8, 8), dtype=np.int8),
+        get_board(),
         np.array([0, 0], dtype=np.int8),
         np.array([0, 0], dtype=np.int8),
         is_white_turn=True
@@ -82,37 +85,37 @@ def warm_up_jit():
     from app.movements.king_movement_utils import is_square_under_attack, can_castle_kingside, can_castle_queenside
     filename_test = "king_movement_utils"
 
-    is_square_under_attack(np.zeros((8, 8), dtype=np.int8), 0, 0, is_white_piece=True), test("is_square_under_attack")
-    can_castle_kingside(np.zeros((8, 8), dtype=np.int8), 0, 0, False), test("can_castle_kingside")
-    can_castle_queenside(np.zeros((8, 8), dtype=np.int8), 0, 0, False), test("can_castle_queenside")
+    is_square_under_attack(get_board(), 0, 0, is_white_piece=True), test("is_square_under_attack")
+    can_castle_kingside(get_board(), 0, 0, False), test("can_castle_kingside")
+    can_castle_queenside(get_board(), 0, 0, False), test("can_castle_queenside")
     # ====================================================
     #
     # ====================================================
     from app.movements.piece_utils import is_in_board
     filename_test = "piece_utils"
 
-    is_in_board(np.zeros((8, 8), dtype=np.int8), 0, 0), test("is_in_board")
+    is_in_board(get_board(), 0, 0), test("is_in_board")
     # ====================================================
     #
     # ====================================================
     from app.state.king import is_king_in_check
     filename_test = "king"
 
-    is_king_in_check(np.zeros((8, 8), dtype=np.int8), 0, 0), test("is_king_in_check")
+    is_king_in_check(get_board(), 0, 0), test("is_king_in_check")
     # ====================================================
     #
     # ====================================================
     from app.state.moves import has_available_moves
     filename_test = "moves"
 
-    has_available_moves(np.zeros((8, 8), dtype=np.int8), np.empty((0, 2, 3), dtype=np.int8)), test("has_available_moves")
+    has_available_moves(get_board(), np.empty((0, 2, 3), dtype=np.int8)), test("has_available_moves")
     # ====================================================
     #
     # ====================================================
     from app.movements.apply_move import apply_move
     filename_test = "apply_move"
 
-    apply_move(np.zeros((8, 8), dtype=np.int8), np.array([[0, 0, 1], [1, 1, 0]], dtype=np.int8), promotion=5), test("apply_move")
+    apply_move(get_board(), np.array([[0, 0, 1], [1, 1, 0]], dtype=np.int8), promotion=5), test("apply_move")
     # ====================================================
     #
     # ====================================================
@@ -120,10 +123,10 @@ def warm_up_jit():
     filename_test = "minimax"
 
     minimax(
-        np.zeros((8, 8), dtype=np.int8),
+        get_board(),
         np.empty((0, 2, 3), dtype=np.int8),
         depth=0,
-        max_depth=1
+        max_depth=0
     ), test("minimax")
     # ====================================================
     #
@@ -131,7 +134,7 @@ def warm_up_jit():
     from app.state.evaluate import evaluate_board
     filename_test = "evaluate"
 
-    evaluate_board(np.zeros((8, 8), dtype=np.int8), np.empty((0, 2, 3), dtype=np.int8)), test("evaluate_board")
+    evaluate_board(get_board(), np.empty((0, 2, 3), dtype=np.int8)), test("evaluate_board")
 
     end_time = time()
 

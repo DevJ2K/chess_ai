@@ -1,10 +1,12 @@
 import numpy as np
-from app.movements.MoveResult import MoveResult
+from numba import njit
 
 
-def apply_move(board: np.ndarray, move: np.ndarray, promotion: np.int8) -> MoveResult:
+@njit
+def apply_move(board: np.ndarray, move: np.ndarray, promotion: np.int8) -> bool:
     if move.shape != (2, 3):
-        return MoveResult.INVALID_SHAPE
+        print("Invalid move shape:", move.shape)
+        return False
 
     start_x, start_y, piece = move[0]
     dest_x, dest_y, _ = move[1]
@@ -31,9 +33,10 @@ def apply_move(board: np.ndarray, move: np.ndarray, promotion: np.int8) -> MoveR
     if abs(piece) == 1:  # Pawn
         if (piece > 0 and dest_y == 7) or (piece < 0 and dest_y == 0):
             if promotion not in [2, 3, 4, 5]:
-                return MoveResult.INVALID_PROMOTION
+                print("Invalid promotion piece:", promotion)
+                return False
             piece *= promotion
 
     board[start_y, start_x] = 0
     board[dest_y, dest_x] = piece
-    return MoveResult.SUCCESS
+    return True
