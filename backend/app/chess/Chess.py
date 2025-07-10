@@ -1,6 +1,6 @@
 import numpy as np
 import re
-# import tests.configuration  # un-comment to ignore Numba JIT annotations
+import tests.configuration  # un-comment to ignore Numba JIT annotations
 from app.movements.get_moves import get_valid_moves
 from app.utils.Colors import REDHB, RESET
 from app.chess.ChessPresets import ChessPresets
@@ -72,7 +72,7 @@ class Chess:
         moves = self.get_valid_moves()
         if move_representation not in moves:
             print(f"Invalid move: {move_representation}. Available moves: {list(moves.keys())}")
-            return False
+            return None
 
         promotion_str = re.search(r"=(\w)", move_representation)
         promotion = 5
@@ -89,6 +89,7 @@ class Chess:
         elif move_representation.endswith('='):
             print("Draw! No valid moves left for the opponent.")
             return True
+        return False
 
     def get_valid_moves(self) -> dict[str, np.ndarray]:
         moves = get_valid_moves(self.board, np.array(self.move_history, dtype=np.int8))
@@ -226,6 +227,7 @@ if __name__ == "__main__":
     import time
     import os
     chess_game = Chess()
+    chess_game.board = ChessPresets.promotion_mat()
     # print(chess_game)
     # input("Press Enter to start the game...")
     # iteration = 0
@@ -239,23 +241,27 @@ if __name__ == "__main__":
     # print(chess_game)
     # print(chess_game.move_history_str == GAME)
 
-    # while True:
-    #     os.system('clear')
-    #     print(chess_game)
-    #     user_input = input("Enter your move (or 'exit' to quit): ")
-    #     if user_input.lower() in ['exit', 'quit', 'q']:
-    #         break
-    #     if chess_game.apply_move_str(user_input):
-    #         break
-    # print(chess_game)
-    print(chess_game.move_history_str)
+    while True:
+        os.system('clear')
+        print(chess_game)
+        user_input = input("Enter your move (or 'exit' to quit): ")
+        if user_input.lower() in ['exit', 'quit', 'q']:
+            break
+        result = chess_game.apply_move_str(user_input)
+        if result is True:
+            break
+        elif result is None:
+            input("Invalid move. Press Enter to continue...")
+    print(chess_game)
+    print(f"Total moves: {len(chess_game.move_history)}")
+    print(" - ".join(chess_game.move_history_str))
 
-    print(chess_game)
-    measureTime = MeasureTime(start=True)
-    for _ in range(1):
-        chess_game.get_valid_moves()
-    measureTime.stop()
-    print(chess_game)
+    # print(chess_game)
+    # measureTime = MeasureTime(start=True)
+    # for _ in range(1):
+    #     chess_game.get_valid_moves()
+    # measureTime.stop()
+    # print(chess_game)
 
     # example_move = "e4"
     # chess_game.apply_move(example_move)
