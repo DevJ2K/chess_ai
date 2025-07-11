@@ -23,7 +23,7 @@ class AiService:
         self.model = "mistral-small-latest"
 
 
-    def __build_messages(self, board: np.ndarray, move_history: str, max_depth: int, suggest_move: np.ndarray, suggest_move_str: str) -> list[ChatMessage]:
+    def __build_messages(self, board: np.ndarray, move_history: str, suggest_move: np.ndarray, suggest_move_str: str) -> list[ChatMessage]:
         messages: list[ChatMessage] = []
         file_folder = Path(__file__).parent
 
@@ -39,7 +39,12 @@ class AiService:
             bot_prompt = file.read()
             messages.append({
                 "role": "system",
-                "content": bot_prompt
+                "content": bot_prompt.format(
+                    board=ChessPresets.default(),
+                    move_history=np.empty((0, 2, 3)).tolist(),
+                    minimax_str="e4",
+                    minimax_coor=np.array([[4, 1, 1], [4, 3, 0]]).tolist()
+                )
             })
 
         with open(file_folder / "input" / "user_input.txt", "r") as file:
@@ -65,9 +70,9 @@ class AiService:
 
         minimax_result = minimax(board, move_history, max_depth=max_depth)
 
-        conversation: list[ChatMessage] = self.__build_messages(board=board, move_history=move_history, max_depth=str(minimax_result), suggest_move=minimax_result[:2], suggest_move_str="e4")
+        conversation: list[ChatMessage] = self.__build_messages(board=board, move_history=move_history, suggest_move=minimax_result[:2], suggest_move_str="e4")
 
-        print(conversation)
+        # print(conversation)
         return []
 
         try:
@@ -115,7 +120,7 @@ class AiService:
 
 
 if __name__ == "__main__":
-    from load_dotenv import load_dotenv
+    from dotenv import load_dotenv
     from app.chess.ChessPresets import ChessPresets
     load_dotenv()
     import os
