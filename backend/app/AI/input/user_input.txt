@@ -1,0 +1,5 @@
+Board : {board}
+
+movements history : {move_history}
+
+minimax suggestion : [{minimax_str}, {minimax_coor}]
