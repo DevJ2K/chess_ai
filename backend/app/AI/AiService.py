@@ -5,6 +5,7 @@ from mistralai import Mistral, CompletionEvent
 # from app.utils.logger import ai_logger
 from app.chess.Chess import Chess
 from app.algorithm.minimax import minimax
+from pathlib import Path
 import numpy as np
 
 
@@ -22,32 +23,37 @@ class AiService:
         self.model = "mistral-small-latest"
 
 
-    def __build_messages(self, board: np.ndarray, move_history: str, max_depth: int, suggest_move: str) -> list[ChatMessage]:
+    def __build_messages(self, board: np.ndarray, move_history: str, max_depth: int, suggest_move: np.ndarray, suggest_move_str: str) -> list[ChatMessage]:
         messages: list[ChatMessage] = []
-        messages.append({
-            "role": "system",
-            "content": "You are a helpful AI assistant specialized in chess. You can answer questions about chess rules, strategies, and history."
-        })
+        file_folder = Path(__file__).parent
 
-# This is the chess piece : {piece}
-        user_input = """
-This is the current state of the chess game:
-Board: {board}
-Move History: {move_history}
-You are required to analyze the current board state and suggest the best move for the player. Use the minimax algorithm to evaluate the best possible move up to a depth of {max_depth} moves
-and provide a detailed explanation of your decision-making process.
-What the last move has changed ? And why this move [{suggest_move}] is the best one ?
-        """
+        with open(file_folder / "docs" / "opening.txt", "r") as file:
+            opening = file.read()
+            messages.append({
+                "role": "system",
+                "content": f"This is the opening strategy for chess:\n{opening}"
+            })
 
-        messages.append({
-            "role": "user",
-            "content": user_input.format(
-                # piece=Chess.PIECES,
-                board=board.tolist(),
-                move_history=move_history,
-                max_depth=max_depth,
-                suggest_move=suggest_move)
-        })
+
+        with open(file_folder / "input" / "bot_prompt.txt", "r") as file:
+            bot_prompt = file.read()
+            messages.append({
+                "role": "system",
+                "content": bot_prompt
+            })
+
+        with open(file_folder / "input" / "user_input.txt", "r") as file:
+            user_input = file.read()
+            messages.append({
+                "role": "user",
+                "content": user_input.format(
+                    board=board,
+                    move_history=move_history,
+                    minimax_str=suggest_move_str,
+                    minimax_coor=suggest_move
+                )
+            })
+
         return messages
 
     def suggest(self, board: np.ndarray, move_history: np.ndarray, max_depth: int = 3):
@@ -59,9 +65,10 @@ What the last move has changed ? And why this move [{suggest_move}] is the best 
 
         minimax_result = minimax(board, move_history, max_depth=max_depth)
 
-        conversation: list[ChatMessage] = self.__build_messages(board=board, move_history=move_history, max_depth=str(minimax_result), suggest_move="e4")
+        conversation: list[ChatMessage] = self.__build_messages(board=board, move_history=move_history, max_depth=str(minimax_result), suggest_move=minimax_result[:2], suggest_move_str="e4")
 
         print(conversation)
+        return []
 
         try:
             response_stream = self.client.chat.stream(
@@ -113,6 +120,21 @@ if __name__ == "__main__":
     load_dotenv()
     import os
     ai_service = AiService(rag=None, api_key=os.getenv("MISTRAL_API_KEY"))
+
+    # apply_move(board, np.array(result[:2], dtype=np.int8), 5)
+
+    # king_value = 6 if (len(move_history) + 1) % 2 == 0 else -6
+
+    # positions = np.where(board == king_value)
+    # if len(positions[0]) > 0:
+    #     y, x = positions[0][0], positions[1][0]
+
+    #     game_status = np.array([
+    #         is_king_in_check(board, x, y),
+    #         has_available_moves(board, np.append(move_history, np.expand_dims(result[:2], axis=0), axis=0))
+    #     ], dtype=np.int8)
+
+    #     print(move_to_str(board, np.array(result[:2], dtype=np.int8), game_status))
 
     for bloc in ai_service.suggest(board=ChessPresets.default(), move_history=np.empty((0, 2, 3), dtype=np.int8), max_depth=2):
         print(bloc, end="", flush=True)
