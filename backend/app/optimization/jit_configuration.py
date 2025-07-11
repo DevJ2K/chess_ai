@@ -131,10 +131,18 @@ def warm_up_jit():
     # ====================================================
     #
     # ====================================================
-    from app.state.evaluate import evaluate_board
+    from app.state.evaluate import evaluate_board, evaluate_material, evaluate_mobility, evaluate_king_safety, evaluate_pawn_structure, evaluate_center_control
     filename_test = "evaluate"
 
     evaluate_board(get_board(), np.empty((0, 2, 3), dtype=np.int8)), test("evaluate_board")
+    evaluate_material(get_board()), test("evaluate_material")
+    evaluate_mobility(get_board()), test("evaluate_mobility")
+    evaluate_king_safety(get_board(), np.empty((0, 2, 3), dtype=np.int8)), test("evaluate_king_safety")
+    evaluate_pawn_structure(get_board()), test("evaluate_pawn_structure")
+    evaluate_center_control(get_board()), test("evaluate_center_control")
+    # ====================================================
+    #
+    # ====================================================
 
     end_time = time()
 

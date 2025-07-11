@@ -94,13 +94,6 @@ def minimax(
     result[1, :] = best_move[1].astype(np.int32)
     result[2, 0] = best_state
     return result
-    # return np.array([
-    #     # np.array(best_move[0], dtype=np.float32),
-    #     # np.array(best_move[1], dtype=np.float32),
-    #     best_move[0].astype(np.float32),
-    #     best_move[1].astype(np.float32),
-    #     np.array([best_state, 0, 0], dtype=np.float32)
-    # ], dtype=np.float32)
 
 
 if __name__ == "__main__":
@@ -112,7 +105,7 @@ if __name__ == "__main__":
     from app.state.king import is_king_in_check
     from app.optimization.jit_configuration import warm_up_jit
     # board = ChessPresets.promotion_mat()
-    board = ChessPresets.default()
+    board = ChessPresets.promotion_mat()
     move_history = np.empty((0, 2, 3), dtype=np.int8)
 
     measure_time = MeasureTime(start=True)
@@ -121,7 +114,7 @@ if __name__ == "__main__":
 
 
 
-    MAX_DEPTH = 4
+    MAX_DEPTH = 6
 
     print("Internal Minimax JIT warm-up...")
     minimax(
