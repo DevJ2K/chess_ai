@@ -5,6 +5,10 @@ from mistralai import Mistral, CompletionEvent
 # from app.utils.logger import ai_logger
 from app.chess.Chess import Chess
 from app.algorithm.minimax import minimax
+from app.movements.apply_move import apply_move
+from app.movements.movement_representation import move_to_str
+from app.state.moves import has_available_moves
+from app.state.king import is_king_in_check
 from pathlib import Path
 import numpy as np
 
@@ -60,20 +64,32 @@ class AiService:
             })
 
         return messages
+    
+    def __convert_move_to_str(self, board: np.ndarray, move_history: np.ndarray, move: np.ndarray) -> np.ndarray:
+        board_copy = board.copy()
+        
+        apply_move(board_copy, np.array(move, dtype=np.int8), 5)
 
-    def suggest(self, board: np.ndarray, move_history: np.ndarray, max_depth: int = 3):
+        king_value = 6 if (len(move_history) + 1) % 2 == 0 else -6
 
-        # The board is maybe optional, but the move history is required
-        # Convert move history to a string representation
-        # Calculate the best move using minimax algorithm
-        # Ask the AI utility of the last move and explain the minimax decision
+        positions = np.where(board_copy == king_value)
+        if len(positions[0]) > 0:
+            y, x = positions[0][0], positions[1][0]
+
+            game_status = np.array([
+                is_king_in_check(board_copy, x, y),
+                has_available_moves(board_copy, np.append(move_history, np.expand_dims(move, axis=0), axis=0))
+            ], dtype=np.int8)
+
+        return move_to_str(board_copy, np.array(move, dtype=np.int8), game_status)
+
+    def suggest(self, board: np.ndarray, move_history: list[str], max_depth: int = 3):
 
         minimax_result = minimax(board, move_history, max_depth=max_depth)
 
-        conversation: list[ChatMessage] = self.__build_messages(board=board, move_history=move_history, suggest_move=minimax_result[:2], suggest_move_str="e4")
+        minimax_result_str = self.__convert_move_to_str(board, move_history, minimax_result[:2])
 
-        # print(conversation)
-        return []
+        conversation: list[ChatMessage] = self.__build_messages(board=board, move_history=move_history, suggest_move=minimax_result[:2], suggest_move_str=minimax_result_str)
 
         try:
             response_stream = self.client.chat.stream(
